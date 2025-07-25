@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chatzipt"
+version = "0.1.0"
+description = "A Python-based AI chat application"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "zCentral", email = "eirestiffanyy@gmail.com"}
+]
+keywords = ["chat", "ai", "chatbot", "gpt"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "requests>=2.25.0",
+    "python-dotenv>=0.19.0",
+    "colorama>=0.4.4",
+    "rich>=12.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=22.0",
+    "isort>=5.0",
+    "flake8>=4.0",
+]
+
+[project.scripts]
+chatzipt = "chatzipt.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/zCentral/ChatZiPT"
+Repository = "https://github.com/zCentral/ChatZiPT"
+Issues = "https://github.com/zCentral/ChatZiPT/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["chatzipt*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88
