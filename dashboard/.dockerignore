@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+
+# Ignore local virtual environment and backup/temp files
+.venv/
+pyvenv.cfg
+
+# Ignore dashboard-specific backup/test files and duplicates
+.env#
+env Backup
+Main system
+test*.py
+test.txt
+
+# Ignore accidental package folder
+ChatZiPT/
+__init__.py

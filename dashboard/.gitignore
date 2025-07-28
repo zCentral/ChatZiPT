@@ -1,0 +1,23 @@
+# Dashboard local ignore patterns
+# Ignore Python virtual environment and caches
+.venv/
+__pycache__/
+
+# Python venv config file
+pyvenv.cfg
+
+# dotenv backup
+.env#
+
+# Configuration & backup files to ignore
+# (config.toml is now deprecated; use .env for configuration)
+config.toml
+
+# Local test scratch file (remove if needed)
+#test.txt
+
+# IDE/editor files
+.vscode/
+
+# ignore the auto-generated ChatZiPT stub folder
+ChatZiPT/

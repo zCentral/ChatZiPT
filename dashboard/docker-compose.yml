@@ -1,0 +1,28 @@
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+
+  manager:
+    build:
+      context: .
+      dockerfile: Dockerfile.manager
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+
+  telegram_dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    env_file:
+      - .env
+    restart: always
