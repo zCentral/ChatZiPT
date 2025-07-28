@@ -1,4 +1,4 @@
-@echo off
+https://github.com/zCentral/ChatZiPT/blob/main/dashboard/dashboard.py@echo off
 REM ------------------------------------------------------------------
 REM Run the XAUUSD bullish engulfing entry script
 REM ------------------------------------------------------------------

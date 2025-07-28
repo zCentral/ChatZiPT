@@ -88,13 +88,19 @@ def sl_tp_logic(df, confidence):
 def ai_explain(symbol: str, action: str, price: float, confidence: float) -> str:
     prompt = (
         f"Asset: {symbol}, Price: {price}, Signal: {action}, Confidence: {int(confidence*100)}%.\n"
-        f"Explain in plain English the technical and AI logic behind this signal, referencing multi-timeframe, SMC, Wyckoff, and candle analysis."
+        f"Explain in plain English the technical and AI logic behind this signal, referencing multi-timeframe, SMC, Wyckoff, and candle analysis. "
+        f"Keep it concise but informative for traders."
     )
     try:
-        resp = openai.ChatCompletion.create(
+        # Updated to use new OpenAI client
+        import openai
+        client = openai.OpenAI(api_key=get_env("OPENAI_API_KEY"))
+        
+        resp = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=120
+            max_tokens=150,
+            temperature=0.7
         )
         return resp.choices[0].message.content.strip()
     except Exception as e:
