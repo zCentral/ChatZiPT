@@ -3,7 +3,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from utils.performance import PerformanceMonitor
-from zpt_analysis import analyze, meme_shitcoin_analysis, multi_timeframe_confluence
+# Import the whole module and use zpt_analysis.meme_shitcoin_analysis and zpt_analysis.multi_timeframe_confluence
+import zpt_analysis
 from zpt_pricefeed import get_price
 import time
 
@@ -84,45 +85,44 @@ with col1:
     st.subheader(f"📊 {symbol} Analysis")
     
     # Get analysis
-    if st.button("🔍 Analyze Signal", type="primary"):
-        with st.spinner("🤖 AI is analyzing market data..."):
-            analysis = analyze(symbol)
-            
-            # Signal display
-            confidence_class = "confidence-high" if analysis["confidence"] > 0.9 else "confidence-medium" if analysis["confidence"] > 0.8 else "confidence-low"
-            
-            st.markdown(f"""
-            <div class="signal-card {confidence_class}">
-                <h3>🎯 Signal: {analysis["action"]}</h3>
-                <h4>📊 Confidence: {analysis["confidence"]:.1%}</h4>
-                <h4>💰 Current Price: ${analysis["price"]:.4f}</h4>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # AI Explanation
-            if "AI Explanations" in ai_features:
-                st.subheader("🧠 AI Analysis")
-                st.info(analysis["explanation"])
-            
-            # Multi-timeframe
-            if "Multi-Timeframe Analysis" in ai_features:
-                st.subheader("⏰ Multi-Timeframe Confluence")
-                mtf_data = analysis["details"]
-                mtf_df = pd.DataFrame.from_dict(mtf_data, orient='index')
-                st.dataframe(mtf_df, use_container_width=True)
-            
-            # SL/TP Levels
-            st.subheader("🎯 Risk Management")
-            sl_tp = analysis["SLTP"]
-            col_sl, col_tp = st.columns(2)
-            
-            with col_sl:
-                st.metric("🛡️ Stop Loss", f"${sl_tp['SL']:.4f}" if sl_tp['SL'] else "N/A")
-            
-            with col_tp:
-                tp_levels = sl_tp['TP'][:3] if sl_tp['TP'] else []
-                for i, tp in enumerate(tp_levels):
-                    st.metric(f"🎯 TP{i+1}", f"${tp:.4f}")
+    with st.spinner("🤖 AI is analyzing market data..."):
+        analysis = zpt_analysis.analyze(symbol)
+        
+        # Signal display
+        confidence_class = "confidence-high" if analysis["confidence"] > 0.9 else "confidence-medium" if analysis["confidence"] > 0.8 else "confidence-low"
+        
+        st.markdown(f"""
+        <div class="signal-card {confidence_class}">
+            <h3>🎯 Signal: {analysis["action"]}</h3>
+            <h4>📊 Confidence: {analysis["confidence"]:.1%}</h4>
+            <h4>💰 Current Price: ${analysis["price"]:.4f}</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # AI Explanation
+        if "AI Explanations" in ai_features:
+            st.subheader("🧠 AI Analysis")
+            st.info(analysis["explanation"])
+        
+        # Multi-timeframe
+        if "Multi-Timeframe Analysis" in ai_features:
+            st.subheader("⏰ Multi-Timeframe Confluence")
+            mtf_data = analysis["details"]
+            mtf_df = pd.DataFrame.from_dict(mtf_data, orient='index')
+            st.dataframe(mtf_df, use_container_width=True)
+        
+        # SL/TP Levels
+        st.subheader("🎯 Risk Management")
+        sl_tp = analysis["SLTP"]
+        col_sl, col_tp = st.columns(2)
+        
+        with col_sl:
+            st.metric("🛡️ Stop Loss", f"${sl_tp['SL']:.4f}" if sl_tp['SL'] else "N/A")
+        
+        with col_tp:
+            tp_levels = sl_tp['TP'][:3] if sl_tp['TP'] else []
+            for i, tp in enumerate(tp_levels):
+                st.metric(f"🎯 TP{i+1}", f"${tp:.4f}")
 
 with col2:
     st.subheader("📈 Live Price")
@@ -143,14 +143,13 @@ with col3:
     if st.button("🔥 Meme Coin Scan", type="secondary"):
         if "Meme Coin Scanner" in ai_features:
             with st.spinner("Scanning meme coins..."):
-                meme_results = meme_shitcoin_analysis()
+                meme_results = zpt_analysis.meme_shitcoin_analysis()
                 if meme_results:
                     st.success(f"Found {len(meme_results)} high-confidence signals!")
                     for result in meme_results[:3]:  # Show top 3
                         st.write(f"🚀 {result['symbol']}: {result['action']} ({result['confidence']:.1%})")
                 else:
                     st.warning("No high-confidence meme signals found.")
-        else:
             st.info("Enable 'Meme Coin Scanner' in AI Features")
     
     if st.button("🧘 Trading Psychology"):

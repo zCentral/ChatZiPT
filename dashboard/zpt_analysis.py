@@ -1,6 +1,12 @@
 import pandas as pd
 import requests
 import ta
+from ta.momentum import RSIIndicator
+from ta.volatility import BollingerBands
+try:
+    from ta.trend import MACD
+except ImportError:
+    MACD = None  # or raise ImportError("MACD indicator not found in ta.trend")
 import openai
 from utils import (
     get_env,
@@ -47,11 +53,17 @@ def multi_timeframe_confluence(symbol: str) -> dict:
 def ta_signal(df: pd.DataFrame) -> tuple[str, float]:
     if df.empty:
         return "HOLD", 0.5
-    df["rsi"] = ta.momentum.RSIIndicator(df["close"]).rsi()
-    macd = ta.trend.MACD(df["close"])
-    df["macd"] = macd.macd()
-    df["macd_signal"] = macd.macd_signal()
-    df["bb_width"] = ta.volatility.BollingerBands(df["close"]).bollinger_wband()
+    # Calculate RSI and add to DataFrame
+    rsi = RSIIndicator(df["close"])
+    df["rsi"] = rsi.rsi()
+    if MACD is not None:
+        macd = MACD(df["close"])
+        df["macd"] = macd.macd()
+        df["macd_signal"] = macd.macd_signal()
+    else:
+        df["macd"] = 0
+        df["macd_signal"] = 0
+    df["bb_width"] = BollingerBands(df["close"]).bollinger_wband()
     last = df.iloc[-1]
     wick_size = last["high"] - last["close"]
     smc_signal = "LONG" if wick_size > last["close"] * 0.01 else "SHORT" if wick_size < -last["close"] * 0.01 else "HOLD"
@@ -102,7 +114,11 @@ def ai_explain(symbol: str, action: str, price: float, confidence: float) -> str
             max_tokens=150,
             temperature=0.7
         )
-        return resp.choices[0].message.content.strip()
+        content = getattr(resp.choices[0].message, "content", None)
+        if content is not None:
+            return content.strip()
+        else:
+            return "AI explanation unavailable."
     except Exception as e:
         log(f"OpenAI error: {e}", level="ERROR")
         return "AI explanation unavailable."
@@ -110,6 +126,8 @@ def ai_explain(symbol: str, action: str, price: float, confidence: float) -> str
 def analyze(symbol: str = "BTCUSDT", user_data=None) -> dict:
     mtf = multi_timeframe_confluence(symbol)
     price = get_price(symbol)
+    if price is None:
+        price = 0.0
     explanation = ai_explain(symbol, mtf["action"], price, mtf["confidence"])
     df = fetch_ohlc_binance(symbol)
     sltp = sl_tp_logic(df, mtf["confidence"])
